@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
+import datetime
 
 # ==========================================
 # 1. PAGE CONFIGURATION & PERMANENT DARK MODE
@@ -11,6 +12,69 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded"
 )
+
+# ==========================================
+# CLOSING NOTICE & REDIRECT LOGIC
+# ==========================================
+# Set the deadline date (3 days from Jan 5, 2026 -> Jan 8, 2026)
+redirect_date = datetime.datetime(2026, 1, 8)
+
+if datetime.datetime.now() > redirect_date:
+    # Redirect logic
+    st.markdown(
+        """
+        <meta http-equiv="refresh" content="0; url=https://chessmastermind.github.io/moon-papers/" />
+        <script>
+            window.location.href = "https://chessmastermind.github.io/moon-papers/";
+        </script>
+        <div style="text-align: center; padding: 50px;">
+            <h1>Website Closed</h1>
+            <p>Redirecting to <a href="https://chessmastermind.github.io/moon-papers/">Moon Papers</a>...</p>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+    st.stop()
+else:
+    # Popup logic
+    if 'popup_closed' not in st.session_state:
+        st.session_state.popup_closed = False
+    
+    if not st.session_state.popup_closed:
+        with st.container():
+            st.markdown(
+                """
+                <div style="
+                    background-color: #856404;
+                    padding: 20px;
+                    border: 2px solid #ffeeba;
+                    border-radius: 10px;
+                    text-align: center;
+                    margin-bottom: 20px;
+                    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                    color: #ffffff !important;
+                ">
+                    <h2 style="color: #ffffff !important; margin-top: 0;">⚠️ WEBSITE CLOSING SOON ⚠️</h2>
+                    <p style="font-size: 18px; color: #ffffff !important;">
+                        This website is closing. We recommend using this better tool:<br>
+                        <a href="https://www.reddit.com/r/ALevelGems/comments/1q43elc/cieedexcel_moon_papers_a_lightningfast_minimalist/" target="_blank" style="font-weight: bold; font-size: 20px; color: #ffecb5 !important; text-decoration: underline;">
+                            Moon Papers
+                        </a>
+                    </p>
+                    <p style="font-size: 14px; color: #ffffff !important;">
+                        You will be redirected automatically after January 8th.
+                    </p>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+            # Centered close button
+            col1, col2, col3 = st.columns([1, 1, 1])
+            with col2:
+                if st.button("Close Notice", use_container_width=True):
+                    st.session_state.popup_closed = True
+                    st.rerun()
+            st.markdown("---")
 
 # Optimized CSS for Laptop Displays
 st.markdown("""
