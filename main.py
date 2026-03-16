@@ -1,126 +1,32 @@
 import streamlit as st
-import pandas as pd
-import numpy as np
-import io
-import streamlit.components.v1 as components
-import datetime
 
-# ==========================================
-# PAGE CONFIGURATION
-# ==========================================
-st.set_page_config(
-    page_title="Moon Papers",
-    layout="wide",
-    initial_sidebar_state="collapsed"
-)
+st.set_page_config(page_title="301 Moved Permanently", page_icon="🌙", layout="centered")
 
-# ==========================================
-# CLOSING NOTICE & REDIRECT LOGIC
-# ==========================================
-# Set the deadline date (3 days from Jan 5, 2026 -> Jan 8, 2026)
-redirect_date = datetime.datetime(2026, 1, 8)
+# Hide Streamlit chrome (menu, footer, header) [9][10]
+hide_st_style = """
+<style>
+#MainMenu {visibility: hidden;}
+footer {visibility: hidden;}
+header {visibility: hidden;}
+.stApp {background-color: #0a0a0a;}
+</style>
+"""
+st.markdown(hide_st_style, unsafe_allow_html=True)
 
-if datetime.datetime.now() > redirect_date:
-    # ---------------------------------------------------------
-    # SCENARIO A: DEADLINE PASSED (Immediate Redirect)
-    # ---------------------------------------------------------
-    st.markdown(
-        """
-        <style>
-            /* Hide Streamlit UI elements during the transition */
-            .stApp { display: none; }
-        </style>
-        <meta http-equiv="refresh" content="0; url=https://chessmastermind.github.io/moon-papers/" />
-        <script>
-            window.location.href = "https://chessmastermind.github.io/moon-papers/";
-        </script>
-        <div style="text-align: center; padding: 50px;">
-            <h1>Website Closed</h1>
-            <p>Redirecting to <a href="https://chessmastermind.github.io/moon-papers/">Moon Papers</a>...</p>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-    st.stop()
+# HTML content rendered directly (not in code block)
+html_content = """
+<div style="text-align: center; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #fff; padding-top: 80px;">
+    <div style="font-size: 72px; margin-bottom: 24px;">🌙</div>
+    <div style="color: #888; font-size: 14px; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 16px;">301 Moved Permanently</div>
+    <h1 style="font-size: 42px; margin-bottom: 32px; font-weight: 700;">Moon Papers Has Relocated</h1>
+    <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 32px; margin: 32px auto; max-width: 600px;">
+        <p style="color: #aaa; font-size: 16px; margin-bottom: 12px;">This page has permanently moved to:</p>
+        <div style="color: #4ade80; font-size: 32px; font-weight: bold; margin: 16px 0; word-break: break-all;">moon-papers.com</div>
+        <p style="color: #666; font-size: 14px; margin: 0;">Please update your bookmarks. The old URL is no longer active.</p>
+    </div>
+    <a href="https://moon-papers.com" target="_top" style="display: inline-block; background: #2563eb; color: #fff; text-decoration: none; padding: 18px 40px; border-radius: 8px; font-weight: 600; font-size: 18px; margin-top: 16px; border: 2px solid #2563eb;">Visit New Site →</a>
+    <p style="color: #444; font-size: 13px; margin-top: 48px;">Clicking the button above will navigate to the new domain.<br>Automatic redirect is blocked by browser security restrictions.</p>
+</div>
+"""
 
-else:
-    # ---------------------------------------------------------
-    # SCENARIO B: DEADLINE ACTIVE (Popup + Iframe)
-    # ---------------------------------------------------------
-    
-    # 1. CSS: Hide UI & Force Dark Theme
-    st.markdown("""
-        <style>
-            /* Hide Header, Footer, Hamburger, Toolbar */
-            header, footer, [data-testid="stToolbar"], .stDeployButton {
-                display: none !important;
-            }
-            
-            /* Remove Padding/Margins for Full Screen Feel */
-            .block-container {
-                padding: 0 !important;
-                margin: 0 !important;
-                max-width: 100% !important;
-            }
-            
-            /* Force Background Black */
-            .stApp {
-                background-color: #000000 !important;
-            }
-            
-            /* Button Styling for the Popup */
-            .stButton > button {
-                width: 100%;
-                border-radius: 8px;
-                background-color: #262730;
-                color: white;
-                border: 1px solid #444;
-            }
-            .stButton > button:hover {
-                border-color: #00ff00;
-                color: #00ff00;
-            }
-        </style>
-    """, unsafe_allow_html=True)
-
-    # 2. Popup State Management
-    if 'popup_closed' not in st.session_state:
-        st.session_state['popup_closed'] = False
-
-    # 3. Logic: Show Popup OR Show Website
-    if not st.session_state['popup_closed']:
-        # --- THE POPUP ---
-        # We use a container to center the warning message
-        with st.container():
-            st.markdown("<br><br><br>", unsafe_allow_html=True) # Spacer
-            col1, col2, col3 = st.columns([1, 2, 1])
-            
-            with col2:
-                st.info(f"⚠️ **Notice:** This legacy link will stop working on {redirect_date.strftime('%B %d, %Y')}. Please update your bookmarks.")
-                
-                # The 'Got it' button
-                if st.button("I understand, continue to site"):
-                    st.session_state['popup_closed'] = True
-                    st.rerun()
-
-    else:
-        # --- THE WEBSITE (Full Screen) ---
-        # This only renders after the user clicks the button
-        html_content = """
-        <!DOCTYPE html>
-        <html style="overflow: hidden;">
-        <head>
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <script data-goatcounter="https://moon-papers.goatcounter.com/count"
-                    async src="//gc.zgo.at/count.js"></script>
-        </head>
-        <body style="margin: 0; padding: 0; background-color: #000000;">
-            <iframe 
-                src="https://chessmastermind.github.io/moon-papers/" 
-                style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; border: none; z-index: 9999;"
-                allowfullscreen
-            ></iframe>
-        </body>
-        </html>
-        """
-        components.html(html_content, height=1000, scrolling=False)
+st.markdown(html_content, unsafe_allow_html=True)
